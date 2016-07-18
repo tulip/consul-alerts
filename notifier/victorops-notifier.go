@@ -31,8 +31,8 @@ type VictorOpsEvent struct {
 	// VictorOps lets you add arbitrary fields to help custom notification logic, so we'll set
 	// node, service, service ID, check, and check ID
 	ConsulNode      string `json:"consul_node"`
-	ConsulService   string `json:"consul_service"`
-	ConsulServiceId string `json:"consul_service_id"`
+	ConsulService   string `json:"consul_service,omitempty"`
+	ConsulServiceId string `json:"consul_service_id,omitempty"`
 	ConsulCheck     string `json:"consul_check"`
 	ConsulCheckId   string `json:"consul_check_id"`
 }
@@ -53,8 +53,13 @@ func (vo *VictorOpsNotifier) Notify(messages Messages) bool {
 	var ok bool = true
 
 	for _, message := range messages {
-		var entityId string = fmt.Sprintf("%s:%s", message.Node, message.ServiceId)
-		var entityDisplayName string = fmt.Sprintf("%s:%s", message.Node, message.Service)
+		var entityId string = message.Node
+		var entityDisplayName string = message.Node
+
+		if message.ServiceId != "" {
+			entityId += fmt.Sprintf(":%s", message.ServiceId)
+			entityDisplayName += fmt.Sprintf(":%s", message.Service)
+		}
 
 		var messageType string = ""
 
