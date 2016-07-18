@@ -53,12 +53,16 @@ func (vo *VictorOpsNotifier) Notify(messages Messages) bool {
 	var ok bool = true
 
 	for _, message := range messages {
-		var entityId string = message.Node
-		var entityDisplayName string = message.Node
+		var entityId string = fmt.Sprintf("%s:", message.Node)
+		var entityDisplayName string = entityId
 
-		if message.ServiceId != "" {
-			entityId += fmt.Sprintf(":%s", message.ServiceId)
-			entityDisplayName += fmt.Sprintf(":%s", message.Service)
+		// This might be a node level check without an explicit service
+		if message.ServiceId == "" {
+			entityId += message.CheckId
+			entityDisplayName += message.Check
+		} else {
+			entityId += message.ServiceId
+			entityDisplayName += message.Service
 		}
 
 		var messageType string = ""
